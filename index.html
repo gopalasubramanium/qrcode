@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive QR Code Generator</title>
+    <meta name="description" content="Generate QR codes easily with this responsive QR Code Generator. Perfect for educational purposes, not intended for commercial use.">
+    <meta name="keywords" content="QR Code, Generator, Responsive, Educational, Free QR Code, QR Code Tool, Online QR Code">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333; transition: background-color 0.5s, color 0.5s; }
+        .container { width: 90%; max-width: 600px; margin: 40px auto; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 10px; position: relative; background-color: #f5f5f5; color: #333; text-align: center; }
+        textarea, button { width: 80%; padding: 12px; margin-top: 20px; border-radius: 4px; border: 1px solid #ccc; }
+        button#generate { background-color: #4CAF50; color: white; cursor: pointer; font-size: 16px; }
+        button#generate:hover { background-color: #45a049; }
+        #qrcode { margin-top: 20px; display: inline-block; }
+        .description { max-width: 600px; margin: 20px auto; display: none; text-align: center; }
+        .material-icons { font-size: 24px; cursor: pointer; color: #333; position: absolute; top: 10px; right: 10px; }
+        .footer { font-size: 12px; margin-top: 20px; color: #666; transition: color 0.5s; }
+        @media (max-width: 600px) {
+            .container { width: 100%; margin-top: 10px; }
+            textarea, button { width: 90%; }
+            #download, #print { width: 40%; margin-top: 10px; }
+        }
+        .btn-group { display: flex; justify-content: space-between; }
+        button#download, button#print { width: 45%; margin-top: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="material-icons" id="theme-toggle" onclick="toggleTheme()">brightness_6</i>
+        <h1>QR Code Generator</h1>
+        <textarea id="text-input" placeholder="Enter text to generate QR code..."></textarea>
+        <button id="generate" onclick="generateQRCode()">Generate QR Code</button>
+        <div id="qrcode"></div>
+        <div class="btn-group">
+            <button id="download" onclick="downloadQR()" style="display: none;">Download QR</button>
+            <button id="print" onclick="printQR()" style="display: none;">Print QR</button>
+        </div>
+        <div class="description" id="qr-details"></div>
+        <div class="footer">
+            <p>This page is for educational purposes and not intended for commercial use.</p>
+            <p>Developed by <a href="https://m.sgopala.com" target="_blank">Gopala Subramanium</a></p>
+        </div>
+    </div>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        function toggleTheme() {
+            var body = document.body;
+            var themeIcon = document.getElementById('theme-toggle');
+            if (body.style.backgroundColor === 'rgb(245, 245, 245)') {
+                body.style.backgroundColor = '#333';
+                body.style.color = '#fff';
+                document.querySelectorAll('.container').forEach(el => {
+                    el.style.backgroundColor = '#333';
+                    el.style.color = '#fff';
+                });
+                themeIcon.textContent = 'brightness_7';
+            } else {
+                body.style.backgroundColor = '#f5f5f5';
+                body.style.color = '#333';
+                document.querySelectorAll('.container').forEach(el => {
+                    el.style.backgroundColor = '#f5f5f5';
+                    el.style.color = '#333';
+                });
+                themeIcon.textContent = 'brightness_6';
+            }
+        }
+
+function cleanText(input) {
+    return input.replace(/[^\x20-\x7E\n]/g, '');  // This regex removes all non-printable characters except for spaces and line breaks
+}
+
+function generateQRCode() {
+    var qrcodeContainer = document.getElementById('qrcode');
+    qrcodeContainer.innerHTML = "";
+    var text = cleanText(document.getElementById('text-input').value);
+    var qr = new QRCode(qrcodeContainer, {
+        text: text,
+        width: 256,
+        height: 256,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+
+    // Show buttons and details
+    document.getElementById('download').style.display = 'inline-block';
+    document.getElementById('print').style.display = 'inline-block';
+    var details = document.getElementById('qr-details');
+    details.innerHTML = `<strong>QR Code Details:</strong><br>Text length: ${text.length} characters<br>
+                         QR Code Version: Automatic (based on input length)<br>
+                         Error Correction Level: High (H)`;
+    details.style.display = 'block'; // Show details only after QR code is generated
+}
+        function downloadQR() {
+            var canvas = document.querySelector('canvas');
+            var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            var link = document.createElement('a');
+            link.download = 'QRCode.png';
+            link.href = image;
+            link.click();
+        }
+
+        function printQR() {
+            var canvas = document.querySelector('canvas');
+            var windowContent = '<!DOCTYPE html>';
+            windowContent += '<html>';
+            windowContent += '<head><title>Print QR Code</title></head>';
+            windowContent += '<body>';
+            windowContent += '<img src="' + canvas.toDataURL("image/png") + '">';
+            windowContent += '</body>';
+            windowContent += '</html>';
+            var printWin = window.open('', '', 'width=340,height=260');
+            printWin.document.open();
+            printWin.document.write(windowContent);
+            printWin.document.close();
+            printWin.focus();
+            printWin.print();
+            printWin.close();
+        }
+    </script>
+</body>
+</html>
